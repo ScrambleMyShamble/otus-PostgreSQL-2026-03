@@ -6,7 +6,7 @@
 ## Окружение
 * Windows хост, на ней Vmvare с ОС Ubuntu
 * Docker/portainer
-* PostgreSQL: образ postgres:17
+* PostgreSQL: образ postgres:17 на ОС Debian
 * Пользователь БД: postgres
 * База данных: otus
 * Каталог с данными: ./var/lib/postgresql
