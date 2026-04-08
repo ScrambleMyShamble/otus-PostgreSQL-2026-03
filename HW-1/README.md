@@ -4,7 +4,7 @@
 Создать и запустить контейнер с PostgreSQL 17, вынести каталог данных базы на хост, убедиться после пересоздания контйнера что все данные на месте.
 
 ## Окружение
-* Vmvare с ОС Ubuntu
+* Windows хост, на ней Vmvare с ОС Ubuntu
 * Docker/portainer
 * PostgreSQL: образ postgres:17
 * Пользователь БД: postgres
