@@ -80,11 +80,14 @@ values (1, 'Костюм слона в натуральную величину')
 (2, 'Банка сгущенки');
 ```
 
-## 3. Подключиться с хоста через dbeaver к базе данных otus на виртуальной машине и сделать проверить данные
+## 3. Подключиться с хоста через dbeaver к базе данных otus и проверить наличие данных
 ```sql
 select * from orders_test;
-<img width="477" height="116" alt="image" src="https://github.com/user-attachments/assets/1d313774-d1ed-40db-bbeb-70bc17b21f45" />
 ```
+
+<img width="578" height="164" alt="image" src="https://github.com/user-attachments/assets/12862b46-87f5-406a-865e-81caebaa1de4" />
+
+<img width="401" height="95" alt="image" src="https://github.com/user-attachments/assets/dd664edd-43f1-4fd7-9251-a9b41d65d303" />
 
 ## 4. Удаляем stack, а следовательно и контейнер с postgresql и проверяем что базы больше нет
 
