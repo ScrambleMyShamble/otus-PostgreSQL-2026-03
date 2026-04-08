@@ -14,7 +14,6 @@
 ## Docker Compose
 Файл docker-compose.yml
 ```yaml
-version: '3.3'
 
 version: '3.3'
 
