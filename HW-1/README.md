@@ -81,10 +81,15 @@ select * from orders_test;
 ```
 
 ## 4. Удаляем stack, а следовательно и контейнер с postgresql и проверяем что базы больше нет
+
 <img width="399" height="106" alt="image" src="https://github.com/user-attachments/assets/10f31878-bf4c-43b0-ab9a-c1abfa23ae11" />
+
 <img width="642" height="309" alt="image" src="https://github.com/user-attachments/assets/9433d466-cd8f-41b7-be0a-52cd645ec621" />
 
 ## 5. Создаем postgresql контейнер и запускаем его, делаем select к базе
+
+<img width="1029" height="637" alt="image" src="https://github.com/user-attachments/assets/8c4e60fa-89fb-4fe5-a8f0-b1d5a6107aa4" />
+
 <img width="442" height="333" alt="image" src="https://github.com/user-attachments/assets/2da0aa28-0a7a-4a8f-8c8e-3f2d68cf4b15" />
 
 # Итог
