@@ -1,6 +1,6 @@
 # Курс PostgreSQL для администраторов и разработчиков (OTUS)
 
-Ссылка: https://otus.ru/lessons/postgresql-dba/
+Ссылка на курс: https://otus.ru/lessons/postgresql-dba/
 
 Цели оубчения
 
