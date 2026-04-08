@@ -59,6 +59,7 @@ networks:
 ## 1. Запуск контейнера
 docker compose up -d
 Проверяем запустился ли
+
 CONTAINER ID   IMAGE              COMMAND                  CREATED          STATUS                       PORTS                                     NAMES
 e6d66d89ac5d   postgres:17   "docker-entrypoint.s…"   14 minutes ago   Up 14 minutes (healthy)      0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp    postgres-db
 
