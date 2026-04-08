@@ -14,7 +14,7 @@ services:
       - zabbix-net
       - monitoring-net
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -28,6 +28,6 @@ networks:
     external: true
 
     
-volumes:
-  postgres_data:
-    driver: local
+#volumes:
+ # postgres_data:
+  #  driver: local
