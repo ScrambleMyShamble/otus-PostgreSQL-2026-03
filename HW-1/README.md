@@ -56,9 +56,7 @@ networks:
       - /var/lib/postgresql/data:/var/lib/postgresql/data
 ```
 
-## 1. Запуск контейнера
-docker compose up -d
-Проверяем запустился ли
+## 1. Проверяем запустился ли
 ```bash
 CONTAINER ID  e6d66d89ac5d
 IMAGE  postgres:17
