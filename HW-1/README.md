@@ -9,7 +9,7 @@
 * PostgreSQL: образ postgres:17
 * Пользователь БД: postgres
 * База данных: otus
-* Каталог с данными: ./var/lib/postgres
+* Каталог с данными: ./var/lib/postgresql
 
 ## Docker Compose
 Файл docker-compose.yml
