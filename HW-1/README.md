@@ -59,9 +59,15 @@ networks:
 ## 1. Запуск контейнера
 docker compose up -d
 Проверяем запустился ли
-
-CONTAINER ID   IMAGE              COMMAND                  CREATED          STATUS                       PORTS                                     NAMES
-e6d66d89ac5d   postgres:17   "docker-entrypoint.s…"   14 minutes ago   Up 14 minutes (healthy)      0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp    postgres-db
+```bash
+CONTAINER ID  e6d66d89ac5d
+IMAGE  postgres:17
+COMMAND "docker-entrypoint.s…"
+CREATED  14 minutes ago
+STATUS Up 14 minutes (healthy)
+PORTS 0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp 
+NAMES postgres-db
+```                   
 
 ## 2. Подключение к контейнеру через Portainer и создание базы данных otus и таблицы orders_test
 ```sql
