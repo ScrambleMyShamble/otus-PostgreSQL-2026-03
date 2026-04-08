@@ -70,6 +70,9 @@ NAMES postgres-db
 ```                   
 
 ## 2. Подключение к контейнеру через Portainer и создание базы данных otus и таблицы orders_test
+
+<img width="724" height="424" alt="image" src="https://github.com/user-attachments/assets/4779f6a3-d634-462e-af28-9365ba997465" />
+
 ```sql
 create database otus;
 
