@@ -84,6 +84,7 @@ values (1, 'Костюм слона в натуральную величину')
 ```sql
 select * from orders_test;
 ```
+Где 192.168.0.194 это ip вирутальной машины
 
 <img width="578" height="164" alt="image" src="https://github.com/user-attachments/assets/12862b46-87f5-406a-865e-81caebaa1de4" />
 
