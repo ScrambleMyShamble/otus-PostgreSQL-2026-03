@@ -162,7 +162,9 @@ Ver Cluster Port Status Owner    Data directory                    Log file
 
 ```sql
 SHOW data_directory;
-data_directory   
+data_directory
+ /mnt/external-disk/pgdata/17/main
+(1 row)  
 ```
 
 После всех манипуляций с данными и переносом диска подключаемся к postgres и проверяем что перенесенные данные доступны с "внешнего диска"
@@ -180,4 +182,55 @@ select * from vm1_test;
  Data from vm_1 postgres databse
 (1 row)
 ```
+
+
+
+## Задание со звездочкой
+
+Заходим во второй чистый контейнер
+
+![photo_2026-04-11_16-23-59](https://github.com/user-attachments/assets/44210934-c588-455a-8016-05fa7c4f8b3e)
+
+Повторяем пункты с установкой Postgres из первой части, поднимаем кластер и проверяем
+
+```bash
+root@vm2:/# service postgresql start
+ * Starting PostgreSQL 17 database server                                                                                     [ OK ] 
+root@vm2:/# pg_lsclusters
+Ver Cluster Port Status Owner    Data directory              Log file
+17  main    5432 online postgres /var/lib/postgresql/17/main /var/log/postgresql/postgresql-17-main.log
+```
+
+Так как данные мы хотим использовать с "внешнего диска" то грохаем дефолтную директорию кластера Postgresql
+
+```bash
+root@vm2:/# rm -rf /var/lib/postgresql/17/main
+root@vm2:/# ls -la /var/lib/postgresql/17/
+total 8
+drwxr-xr-x 2 postgres postgres 4096 Apr 11 15:37 .
+drwxr-xr-x 3 postgres postgres 4096 Apr 11 15:34 ..
+```
+
+Также заменяем директорию с данными на "внешнюю" в файле конфигурации, по аналогии с первой частью
+
+![photo_2026-04-11_16-24-04](https://github.com/user-attachments/assets/ab2887c4-00a0-4a3e-8d34-b15a4a846934)
+
+Запускаем кластер и првоеряем что внешний диск подключен, а значит должны получить данные из таблицы vm1_test
+
+```bash
+root@vm2:/etc/postgresql/17/main# psql -U postgres
+psql (17.9 (Ubuntu 17.9-1.pgdg24.04+1))
+Type "help" for help.
+```
+
+```sql
+postgres=# select *
+postgres-# from vm1_test;
+              field              
+---------------------------------
+ Data from vm_1 postgres databse
+(1 row)
+```
+
+
 
