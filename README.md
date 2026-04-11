@@ -14,3 +14,4 @@
 Домашние задания:
 
 [HW-1 Установка PostgreSQL](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-1)
+[HW-2 Физический уровень PostgreSQL](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-2)
