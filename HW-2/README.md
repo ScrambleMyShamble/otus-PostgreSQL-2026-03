@@ -215,6 +215,9 @@ drwxr-xr-x 3 postgres postgres 4096 Apr 11 15:34 ..
 
 ![photo_2026-04-11_16-24-04](https://github.com/user-attachments/assets/ab2887c4-00a0-4a3e-8d34-b15a4a846934)
 
+<img width="573" height="236" alt="image" src="https://github.com/user-attachments/assets/e2de1b54-aa4e-4ea0-9e07-1d561a456a9f" />
+
+
 Запускаем кластер и првоеряем что внешний диск подключен, а значит должны получить данные из таблицы vm1_test
 
 ```bash
