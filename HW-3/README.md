@@ -110,7 +110,7 @@ GRANT readonly TO testread;
 
 
 
-## Првоерка прав
+## 3. Првоерка прав
 Подключаемся к бд testdb под пользователем testread 
 
 ```sql
@@ -142,4 +142,59 @@ ERROR:  permission denied for table t1
 ```
 
 Поведение верное, прав на эти команды у пользователя нет.
+
+4. ## Меняем дефолтное поведение прав на объекты
+
+ ```sql
+postgres=# ALTER DEFAULT PRIVILEGES IN SCHEMA testnm GRANT SELECT ON TABLES TO readonly;
+ALTER DEFAULT PRIVILEGES
+```
+
+Создаем новый объект в схеме testnm и вставим данные
+ ```sql
+postgres=# create table testnm.t3(c3 integer);
+CREATE TABLE
+
+postgres=# insert into testnm.t3
+values (555);
+INSERT 0 1
+```
+
+5. Снова зайдем под пользователем testread и сделаем select к новой таблице
+ ```sql
+root@7ca7365ed9d8:/# psql -h localhost -U testread -d testdb -W
+Password: 
+psql (17.9 (Debian 17.9-1.pgdg13+1))
+Type "help" for help.
+
+testdb=> select * from testnm.t3
+;
+ c3  
+-----
+ 555
+(1 row)
+```
+
+Права есть, хотя явно мы их не выдавали. Команда
+ ```sql
+ALTER DEFAULT PRIVILEGES IN SCHEMA testnm GRANT SELECT ON TABLES TO readonly
+```
+как бы говорит, что на все объекты который будут созданы в схеме testnm, дай правай на select.
+
+
+# Возможное неожиданное/неявное поведение.
+
+В Postgresql имеется механика дефолтного создания объектов в определенной схеме, путь этот можно увидет через команду SHOW search_path;
+В нашем случае эта команда показывает
+```sql
+testdb=> SHOW search_path;
+   search_path   
+-----------------
+ "$user", public
+```
+
+Если бы при создании таблицы я не указывал явно схему testnm, таблица t1 создалась бы в схеме public, что могло бы запутать.
+Поэтому при создании/изменении каких либо объектов в Postgresql лучше не лениться и указывать полный путь, а именно схема.имя_объекта.
+
+
 
