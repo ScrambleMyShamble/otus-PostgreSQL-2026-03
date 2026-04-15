@@ -97,7 +97,7 @@ testdb=# GRANT SELECT ON ALL TABLES IN SCHEMA testnm TO readonly;
 GRANT
 ```
 
-## 2. Создание роли testread и выдача прав
+## 2. Создание пользователя testread и выдача прав
 ```sql
 testdb=# CREATE USER testread WITH PASSWORD 'test123';
 CREATE ROLE
