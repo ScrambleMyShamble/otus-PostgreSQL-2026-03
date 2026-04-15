@@ -97,7 +97,7 @@ testdb=# GRANT SELECT ON ALL TABLES IN SCHEMA testnm TO readonly;
 GRANT
 ```
 
-## 2. Создание пользователя testread и выдача прав
+## 3. Создание пользователя testread и выдача прав
 ```sql
 testdb=# CREATE USER testread WITH PASSWORD 'test123';
 CREATE ROLE
@@ -110,7 +110,7 @@ GRANT readonly TO testread;
 
 
 
-## 3. Првоерка прав
+## 4. Првоерка прав
 Подключаемся к бд testdb под пользователем testread 
 
 ```sql
@@ -143,7 +143,7 @@ ERROR:  permission denied for table t1
 
 Поведение верное, прав на эти команды у пользователя нет.
 
-## 4. Меняем дефолтное поведение прав на объекты
+## 5. Меняем дефолтное поведение прав на объекты
 
  ```sql
 postgres=# ALTER DEFAULT PRIVILEGES IN SCHEMA testnm GRANT SELECT ON TABLES TO readonly;
@@ -160,7 +160,7 @@ values (555);
 INSERT 0 1
 ```
 
-5. Снова зайдем под пользователем testread и сделаем select к новой таблице
+## 6. Снова зайдем под пользователем testread и сделаем select к новой таблице
  ```sql
 root@7ca7365ed9d8:/# psql -h localhost -U testread -d testdb -W
 Password: 
@@ -182,7 +182,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA testnm GRANT SELECT ON TABLES TO readonly
 как бы говорит, что на все объекты который будут созданы в схеме testnm, дай правай на select.
 
 
-# Возможное неожиданное/неявное поведение.
+# 7. Возможное неожиданное/неявное поведение.
 
 В Postgresql имеется механика дефолтного создания объектов в определенной схеме, путь этот можно увидет через команду SHOW search_path;
 В нашем случае эта команда показывает
