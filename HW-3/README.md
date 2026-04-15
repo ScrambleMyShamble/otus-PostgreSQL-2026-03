@@ -143,7 +143,7 @@ ERROR:  permission denied for table t1
 
 Поведение верное, прав на эти команды у пользователя нет.
 
-4. ## Меняем дефолтное поведение прав на объекты
+## 4. Меняем дефолтное поведение прав на объекты
 
  ```sql
 postgres=# ALTER DEFAULT PRIVILEGES IN SCHEMA testnm GRANT SELECT ON TABLES TO readonly;
