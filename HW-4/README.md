@@ -77,8 +77,11 @@ done in 8.14 s (drop tables 0.00 s, create tables 0.02 s, client-side generate 5
 pgbench -U postgres -c 10 -j 4 -T 60 pgbench_test
 ```
 Где 
+&nbsp;
 -c = Количество клиентов
+&nbsp;
 -j = Количество потоков
+&nbsp;
 -T = Время в секундах
 
 ## Результат
