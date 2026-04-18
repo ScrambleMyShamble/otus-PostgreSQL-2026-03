@@ -125,6 +125,7 @@ SHOW max_connections;
 
 ### Давайте, отталкиваясь от системы, разгоним нашего бедолагу, выставив нужные значения в конфигурационном файле Postgresql.
 
+Кэширует данные в RAM
 <img width="583" height="71" alt="image" src="https://github.com/user-attachments/assets/e7ef760d-58c1-4c43-aa91-e9f3acd4c521" />
 &nbsp;
 
