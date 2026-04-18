@@ -109,7 +109,7 @@ tps = 752.517764 (without initial connection time)
 * RAM: total        used        free      shared  buff/cache   available
        7.5Gi       1.5Gi       4.1Gi        54Mi       2.2Gi       6.0Gi
 
-## Интересующие нас настройки postgresql
+### Интересующие нас настройки postgresql
 ```sql
 SHOW shared_buffers;
 128MB
@@ -123,7 +123,7 @@ SHOW max_connections;
 100
 ```
 
-## Давайте, отталкиваясь от системы, разгоним нашего бедолагу, выставив нужные значения в конфигурационном файле Postgresql.
+### Давайте, отталкиваясь от системы, разгоним нашего бедолагу, выставив нужные значения в конфигурационном файле Postgresql.
 
 <img width="583" height="71" alt="image" src="https://github.com/user-attachments/assets/e7ef760d-58c1-4c43-aa91-e9f3acd4c521" />
 
@@ -152,14 +152,51 @@ SHOW max_connections;
 <img width="845" height="53" alt="image" src="https://github.com/user-attachments/assets/2580f816-9c1e-4353-b949-947053554af9" />
 
 
-Применяем настройки перезагрузив контейнер с Postgresql 17
+Применяем настройки перезагрузив контейнер с Postgresql 17, через stop-start stack
 
+<img width="1229" height="744" alt="image" src="https://github.com/user-attachments/assets/8bd3fa62-999e-42e9-aaa3-d0ba48c16c50" />
 
+Проверяем на примере одного параметра что настрйоки применились
 
+<img width="440" height="775" alt="image" src="https://github.com/user-attachments/assets/6999ede9-21d9-473b-a9f8-c4b4af929e19" />
 
+Успех, можно гнать новые тесты.
 
+# 6. Прогоняем тот же тест, но с новыми настройками
+```sql
+pgbench -U postgres -c 10 -j 4 -T 60 pgbench_test
+```
 
+Результат
+```sql
+root@2457467c1dd5:/# pgbench -U postgres -c 10 -j 4 -T 60 pgbench_test
+pgbench (17.9 (Debian 17.9-1.pgdg13+1))
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 10
+query mode: simple
+number of clients: 10
+number of threads: 4
+maximum number of tries: 1
+duration: 60 s
+number of transactions actually processed: 78198
+number of failed transactions: 0 (0.000%)
+latency average = 7.669 ms
+initial connection time = 45.623 ms
+tps = 1303.981743 (without initial connection time)
+```
 
+# 7. Что и почему подкрутили
+Параметр	                          Почему изменили
+fsync = off	                        PostgreSQL не будет принудительно сбрасывать данные на диск при каждом коммите → HDD не тормозит
+synchronous_commit = off	          Не ждёт записи WAL на диск → каждая транзакция быстрее
+full_page_writes = off	            Не дублирует страницы в WAL после чекпоинтов → меньше записей на диск
+shared_buffers = 2GB	              Кэширует данные в RAM (25% от памяти) → меньше чтений с медленного HDD
+effective_cache_cache = 4GB	        Подсказка планировщику: ОС может использовать ~4GB под кэш → выбирает правильные планы запросов
+work_mem = 32MB	                    Увеличивает память для сортировок/хешей (было 4MB) → меньше временных файлов на диске
+wal_buffers = 16MB	                Больше буфер для WAL перед записью → реже сбрасывается на диск
+checkpoint_completion_target = 0.9	Растягивает запись "грязных" страниц на диск → снижает пиковую нагрузку на HDD
+max_wal_senders = 0	                Отключает репликацию → не нужна для теста, экономит ресурсы
 
 
 
