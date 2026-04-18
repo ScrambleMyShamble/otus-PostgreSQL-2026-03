@@ -127,12 +127,18 @@ SHOW max_connections;
 
 Кэширует данные в RAM
 <img width="583" height="71" alt="image" src="https://github.com/user-attachments/assets/e7ef760d-58c1-4c43-aa91-e9f3acd4c521" />
-&nbsp;&nbsp;
+&nbsp;
+
+&nbsp;
+
 Планы запросов
 <img width="521" height="37" alt="image" src="https://github.com/user-attachments/assets/d5d1860d-3e8a-4447-ad0b-d2b2bb5d4d9f" />
 &nbsp;
+
 &nbsp;
+
 &nbsp;
+
 Увеличивает память для сортировок/хешей
 <img width="936" height="79" alt="image" src="https://github.com/user-attachments/assets/9de2435a-a8ea-4355-abad-c196e749a0ac" />
 &nbsp;
