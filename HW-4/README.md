@@ -113,6 +113,8 @@ tps = 752.517764 (without initial connection time)
 * Диск: sda 100G disk VMware Virtual S. Тип 1, т.е. HDD Диск
 * CPU: 2 ядра
 * RAM:
+&nbsp;
+
 | total       | used        |    free    |  shared     | buff/cache   | available    |
 |-------------|-------------||-------------|-------------||-------------|-------------|
 |    7.5Gi    |   1.5Gi     | 4.1Gi      |  54Mi       | 2.2Gi        | 6.0Gi        |
