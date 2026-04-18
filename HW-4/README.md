@@ -126,31 +126,31 @@ SHOW max_connections;
 ### Давайте, отталкиваясь от системы, разгоним нашего бедолагу, выставив нужные значения в конфигурационном файле Postgresql.
 
 <img width="583" height="71" alt="image" src="https://github.com/user-attachments/assets/e7ef760d-58c1-4c43-aa91-e9f3acd4c521" />
-
+&nbsp;
 
 <img width="521" height="37" alt="image" src="https://github.com/user-attachments/assets/d5d1860d-3e8a-4447-ad0b-d2b2bb5d4d9f" />
 
-
+&nbsp;
 <img width="936" height="79" alt="image" src="https://github.com/user-attachments/assets/9de2435a-a8ea-4355-abad-c196e749a0ac" />
-
+&nbsp;
 
 <img width="1021" height="49" alt="image" src="https://github.com/user-attachments/assets/88781d0f-19c1-4c4f-a465-b6b55a5d2225" />
 
-
+&nbsp;
 <img width="774" height="54" alt="image" src="https://github.com/user-attachments/assets/1ba61a59-71fd-4581-8655-c0a54eb61ace" />
-
+&nbsp;
 
 <img width="961" height="48" alt="image" src="https://github.com/user-attachments/assets/97675e43-7273-456b-87c4-156e400ad49d" />
 
-
+&nbsp;
 <img width="781" height="49" alt="image" src="https://github.com/user-attachments/assets/33f5e6db-9597-4e86-82ca-63cf31d5044d" />
-
+&nbsp;
 
 <img width="892" height="71" alt="image" src="https://github.com/user-attachments/assets/a4d7c81f-8cdb-42ea-a81f-2147c0d27731" />
-
+&nbsp;
 
 <img width="845" height="53" alt="image" src="https://github.com/user-attachments/assets/2580f816-9c1e-4353-b949-947053554af9" />
-
+&nbsp;
 
 Применяем настройки перезагрузив контейнер с Postgresql 17, через stop-start stack
 
