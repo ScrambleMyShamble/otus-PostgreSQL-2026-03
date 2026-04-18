@@ -125,39 +125,39 @@ SHOW max_connections;
 
 ### Давайте, отталкиваясь от системы, разгоним нашего бедолагу, выставив нужные значения в конфигурационном файле Postgresql.
 
-Кэширует данные в RAM
+* Кэширует данные в RAM
 <img width="583" height="71" alt="image" src="https://github.com/user-attachments/assets/e7ef760d-58c1-4c43-aa91-e9f3acd4c521" />
 &nbsp;
 
-Планы запросов
+* Планы запросов
 <img width="521" height="37" alt="image" src="https://github.com/user-attachments/assets/d5d1860d-3e8a-4447-ad0b-d2b2bb5d4d9f" />
 &nbsp;
 
-Увеличивает память для сортировок/хешей
+* Увеличивает память для сортировок/хешей
 <img width="936" height="79" alt="image" src="https://github.com/user-attachments/assets/9de2435a-a8ea-4355-abad-c196e749a0ac" />
 &nbsp;
 
-Буфер для WAL перед записью
+* Буфер для WAL перед записью
 <img width="1021" height="49" alt="image" src="https://github.com/user-attachments/assets/88781d0f-19c1-4c4f-a465-b6b55a5d2225" />
 &nbsp;
 
-Не ждёт записи WAL на диск
+* Не ждёт записи WAL на диск
 <img width="774" height="54" alt="image" src="https://github.com/user-attachments/assets/1ba61a59-71fd-4581-8655-c0a54eb61ace" />
 &nbsp;
 
-Растягивает запись "грязных" страниц на диск
+* Растягивает запись "грязных" страниц на диск
 <img width="961" height="48" alt="image" src="https://github.com/user-attachments/assets/97675e43-7273-456b-87c4-156e400ad49d" />
 &nbsp;
 
-Отключает репликацию
+* Отключает репликацию
 <img width="781" height="49" alt="image" src="https://github.com/user-attachments/assets/33f5e6db-9597-4e86-82ca-63cf31d5044d" />
 &nbsp;
 
-Сброс данных на диск
+* Сброс данных на диск
 <img width="892" height="71" alt="image" src="https://github.com/user-attachments/assets/a4d7c81f-8cdb-42ea-a81f-2147c0d27731" />
 &nbsp;
 
-Не дублирует страницы в WAL
+* Не дублирует страницы в WAL
 <img width="845" height="53" alt="image" src="https://github.com/user-attachments/assets/2580f816-9c1e-4353-b949-947053554af9" />
 &nbsp;
 
@@ -197,15 +197,35 @@ tps = 1303.981743 (without initial connection time)
 
 # 7. Что и почему подкрутили
 Параметр	                          Почему изменили
+&nbsp;
+
 fsync = off	                        PostgreSQL не будет принудительно сбрасывать данные на диск при каждом коммите → HDD не тормозит
+&nbsp;
+
 synchronous_commit = off	          Не ждёт записи WAL на диск → каждая транзакция быстрее
+&nbsp;
+
 full_page_writes = off	            Не дублирует страницы в WAL после чекпоинтов → меньше записей на диск
+&nbsp;
+
 shared_buffers = 2GB	              Кэширует данные в RAM (25% от памяти) → меньше чтений с медленного HDD
+&nbsp;
+
 effective_cache_cache = 4GB	        Подсказка планировщику: ОС может использовать ~4GB под кэш → выбирает правильные планы запросов
+&nbsp;
+
 work_mem = 32MB	                    Увеличивает память для сортировок/хешей (было 4MB) → меньше временных файлов на диске
+&nbsp;
+
 wal_buffers = 16MB	                Больше буфер для WAL перед записью → реже сбрасывается на диск
+&nbsp;
+
 checkpoint_completion_target = 0.9	Растягивает запись "грязных" страниц на диск → снижает пиковую нагрузку на HDD
+&nbsp;
+
 max_wal_senders = 0	                Отключает репликацию → не нужна для теста, экономит ресурсы
+&nbsp;
+
 
 
 
