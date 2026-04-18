@@ -129,8 +129,6 @@ SHOW max_connections;
 <img width="583" height="71" alt="image" src="https://github.com/user-attachments/assets/e7ef760d-58c1-4c43-aa91-e9f3acd4c521" />
 &nbsp;
 
-&nbsp;
-
 Планы запросов
 <img width="521" height="37" alt="image" src="https://github.com/user-attachments/assets/d5d1860d-3e8a-4447-ad0b-d2b2bb5d4d9f" />
 &nbsp;
