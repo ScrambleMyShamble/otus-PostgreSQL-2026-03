@@ -81,6 +81,7 @@ READ COMMITTED позволяет видеть только закоммичен
 Повторим все с нуля с новым уровнем изоляции, перезайдем в сессии и выставим autocommit = off, пересоздадим табличку
 
 <img width="1488" height="173" alt="image" src="https://github.com/user-attachments/assets/98972ca5-8d9d-450f-85be-33ab42e57c98" />
+
 ```sql
 postgres=# CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
