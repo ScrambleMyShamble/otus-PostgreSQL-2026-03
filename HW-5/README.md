@@ -69,10 +69,34 @@ COMMIT;
            1 |       300
 (1 row)
 ```
-## 3. Результат READ COMMITTED
+## 2.1 Результат READ COMMITTED
 * Первый SELECT в сессии 2: count=2, sum=300 (данные до вставки).
 * Второй SELECT в сессии 2: count=3, sum=600 (видит новый заказ из сессии 1, т.к. тот уже закоммичен).
 * После COMMIT в сессии 2 — данные сохраняются, но агрегат уже не меняется в рамках завершённой транзакции.
+
+READ COMMITTED позволяет видеть только закоммиченные изменения других транзакций. При повторном запросе транзакция видит новый закоммиченный заказ.
+
+
+## 3. Сценарий 2: Уровень изоляции REPEATABLE READ
+Повторим все с нуля с новым уровнем изоляции, перезайдем в сессии и выставим autocommit = off, пересоздадим табличку
+
+<img width="1488" height="173" alt="image" src="https://github.com/user-attachments/assets/98972ca5-8d9d-450f-85be-33ab42e57c98" />
+```sql
+postgres=# CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    amount NUMERIC
+);
+
+INSERT INTO orders (amount) VALUES (100), (200);
+COMMIT;
+CREATE TABLE
+INSERT 0 2
+COMMIT
+```
+
+### Сессия 2 
+
 
 
 
