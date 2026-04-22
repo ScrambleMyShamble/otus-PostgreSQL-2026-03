@@ -17,3 +17,5 @@
 * [HW-2 Физический уровень PostgreSQL](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-2)
 * [HW-3 Логический уровень PostgreSQL](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/blob/main/HW-3)
 * [HW-4 Настройка PostgreSQL](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/blob/main/HW-4)
+* [HW-5 Изоляция транзакций](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-5)
+  
