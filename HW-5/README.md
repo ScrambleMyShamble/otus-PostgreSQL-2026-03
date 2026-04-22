@@ -9,6 +9,78 @@
 * Подключиться через портейнер к контейнеру, открыть две сессии и отключить в них автокоммит
 * Создать таблицу orders и вставить несколько строк
 
-1. Подключаемся, создаем таблицу, открываем 2 сессии
+## 1. Подключаемся, создаем таблицу, открываем 2 сессии
+
+<img width="1773" height="664" alt="image" src="https://github.com/user-attachments/assets/412616a7-bde6-4e4e-8646-74f7b6a5711a" />
+
+```sql
+postgres=# CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    amount NUMERIC
+);
+
+INSERT INTO orders (amount) VALUES (100), (200);
+CREATE TABLE
+INSERT 0 2
+postgres=*# COMMIT;
+COMMIT
+```
+Проверяем что данные есть и видны в обоих сессиях
+
+<img width="1565" height="248" alt="image" src="https://github.com/user-attachments/assets/c2979a43-425e-48ab-a4bb-de46ebd62cfe" />
+
+## 2. Сценарий 1: Уровень изоляции READ COMMITTED
+## Сессия 2
+Начинаем транзакцию, читаем данные, считаем сумму
+
+```sql
+postgres=# BEGIN;
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+SELECT COUNT(*) AS order_count, SUM(amount) AS total_sum
+FROM orders
+WHERE created_at > now() - interval '1 minute';
+BEGIN
+SET
+ order_count | total_sum 
+-------------+-----------
+           2 |       300
+```
+
+## Сессия 1 (параллельно, пока сессия 2 не закоммитила)
+
+```sql
+postgres=# BEGIN;
+INSERT INTO orders (amount) VALUES (300);
+COMMIT;
+BEGIN
+INSERT 0 1
+```
+## Сессия 2 (продолжение)
+```sql
+postgres=*# SELECT COUNT(*) AS order_count, SUM(amount) AS total_sum
+FROM orders
+WHERE created_at > now() - interval '1 minute';
+
+COMMIT;
+ order_count | total_sum 
+-------------+-----------
+           1 |       300
+(1 row)
+```
+## 3. Результат READ COMMITTED
+* Первый SELECT в сессии 2: count=2, sum=300 (данные до вставки).
+* Второй SELECT в сессии 2: count=3, sum=600 (видит новый заказ из сессии 1, т.к. тот уже закоммичен).
+* После COMMIT в сессии 2 — данные сохраняются, но агрегат уже не меняется в рамках завершённой транзакции.
+
+
+
+
+
+
+
+
+
 
 
