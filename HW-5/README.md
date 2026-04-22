@@ -39,8 +39,7 @@ postgres=# BEGIN;
 SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
 
 SELECT COUNT(*) AS order_count, SUM(amount) AS total_sum
-FROM orders
-WHERE created_at > now() - interval '1 minute';
+FROM orders;
 BEGIN
 SET
  order_count | total_sum 
@@ -60,8 +59,7 @@ INSERT 0 1
 ## Сессия 2 (продолжение)
 ```sql
 postgres=*# SELECT COUNT(*) AS order_count, SUM(amount) AS total_sum
-FROM orders
-WHERE created_at > now() - interval '1 minute';
+FROM orders;
 
 COMMIT;
  order_count | total_sum 
