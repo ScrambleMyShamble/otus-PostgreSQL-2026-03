@@ -64,7 +64,7 @@ FROM orders;
 COMMIT;
  order_count | total_sum 
 -------------+-----------
-           1 |       300
+           1 |       600
 (1 row)
 ```
 ## 2.1 Результат READ COMMITTED
