@@ -107,3 +107,102 @@ postgres=# SELECT relname, n_dead_tup FROM pg_stat_user_tables WHERE relname = '
 ```
 ответ 0 - таблица актуальная, и так как никаких изменения в ней еще не происходило, логично что мертвых строк в ней быть не может.
 
+### 4.4 Выполняем 5 полных обновлений таблицы по полю text_field, для удобства используем функцию
+
+```sql
+CREATE OR REPLACE FUNCTION update_test_table()
+RETURNS VOID AS $$
+DECLARE
+    i INTEGER;
+BEGIN
+    FOR i IN 1..5 LOOP
+        UPDATE test_table SET text_field = text_field || '+';
+        RAISE NOTICE 'Итерация % выполнена', i;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;;
+```
+
+Убеждаемся что апдейт прошел и функция отработала
+
+<img width="875" height="182" alt="image" src="https://github.com/user-attachments/assets/ac07c5c5-ec30-417d-a936-a8307d91e3d1" />
+
+```sql
+postgres=# select * from test_table limit 1;
+ id |    text_field    
+----+------------------
+  1 | test text 1+++++
+(1 row)
+```
+
+### 4.5 Дожидаемся срабатывания autovacuum и смторит обновленную статистику по таблице
+```sql
+postgres=# SELECT last_autovacuum, n_dead_tup, pg_size_pretty(pg_total_relation_size('test_table'))
+FROM pg_stat_user_tables WHERE relname = 'test_table';
+        last_autovacuum        | n_dead_tup | pg_size_pretty 
+-------------------------------+------------+----------------
+ 2026-04-25 13:02:29.600598+00 |          0 | 399 MB
+(1 row)
+```
+
+```sql
+postgres=# SELECT relname, n_dead_tup, last_autovacuum, last_vacuum
+FROM pg_stat_user_tables WHERE relname = 'test_table';
+  relname   | n_dead_tup |        last_autovacuum        | last_vacuum 
+------------+------------+-------------------------------+-------------
+ test_table |          0 | 2026-04-25 13:02:29.600598+00 | 
+(1 row)
+```
+
+```sql
+postgres=# SELECT pg_size_pretty(pg_total_relation_size('test_table')) AS total_size;
+ total_size 
+------------
+ 399 MB
+(1 row)
+```
+
+Видим что autovacuum отработал, мертвых строк в нашей таблице нет, но объем таблицы увеличился в разы. Это произошло потому, что после процесса обновления поля таблицы на диске для этой таблицы были созданы новые версии строк, которые были помещены в новые страницы данных. autovacuum почистил страницы с данными, но он не отдает свободное место обратно ОС, страницы с данными хоть и стали пустыми, они помечаются как готовые для записи новых данных.
+
+## 5. Обновление таблицы с отключенным autovacuum
+Отключаем autovacuum для нашей таблицы
+```sql
+postgres=# ALTER TABLE test_table SET (autovacuum_enabled = false);
+ALTER TABLE
+```
+
+### 5.1 Снова обновляем поле text_field, но добавим туда текст 'autovacuum off' и дополним вывод функции в консоль.
+Убеждаемся
+```sql
+postgres=# select * from test_table limit 1;
+ id |                                       text_field                                        
+----+-----------------------------------------------------------------------------------------
+ 37 | test text 37+++++autovacuum offautovacuum offautovacuum offautovacuum offautovacuum off
+(1 row)
+```
+
+<img width="1231" height="321" alt="image" src="https://github.com/user-attachments/assets/d819cbd0-0e8c-4bfc-b514-8b7bfb4a69a9" />
+
+### 5.2 Смотрим статистику по мертвым строкам
+```sql
+postgres=# SELECT n_dead_tup, pg_size_pretty(pg_total_relation_size('test_table'))
+FROM pg_stat_user_tables WHERE relname = 'test_table';
+ n_dead_tup | pg_size_pretty 
+------------+----------------
+    4999897 | 617 MB
+```
+
+## 6. Итоги, объяснение
+* MVCC в PostgreSQL: при UPDATE старая версия строки не перезаписывается, а создаётся новая. Старая становится «мёртвой» (dead tuple), пока не будет удалена VACUUM.
+* Когда autovacuum отключён: мёртвые строки накапливаются, занимая место на диске. Таблица физически растёт, потому что новые версии строк добавляются, а старые не освобождаются.
+* Даже при одинаковом количестве живых строк размер увеличивается из-за хранения всех устаревших версий.
+* При включённом autovacuum он периодически очищает мёртвые строки, возвращая место в файловую систему (или оставляя внутри таблицы для переиспользования)
+
+ Вернем autovacuum
+```sql
+ postgres=# ALTER TABLE test_table SET (autovacuum_enabled = true);
+ALTER TABLE
+```
+
+## 7. Задание со звёздочкой
+Было выполнено при апдейтах таблицы через функцию
