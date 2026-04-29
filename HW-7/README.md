@@ -160,7 +160,7 @@ root@adminer-VMware-Virtual-Platform:/var/lib/postgresql/data#
 ```docker
 docker logs 2457467c1dd5 2>&1 | grep "checkpoint"
 ```
-вытаскиваем все логи связанные с checkpoint и считаем(уточню, время выставленное на сервере ubuntu не совпадает с Московским, небольшой рассинхрон в 3часа)
+вытаскиваем все логи(файл 'Postgres log' приложен) связанные с checkpoint и считаем(уточню, время выставленное на сервере ubuntu не совпадает с Московским, небольшой рассинхрон в 3часа)
 
 * Количество КТ за 10 минут:
 21 КТ (с 13:29:54 по 13:39:54 включительно)
@@ -224,18 +224,175 @@ postgres=# SELECT pg_reload_conf();
 (1 row)
 ```
 
+```sql
+postgres@2457467c1dd5:/var/lib$ pgbench -c 8 -j 4 -T 600 pgbench_test
+pgbench (17.9 (Debian 17.9-1.pgdg13+1))
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 100
+query mode: simple
+number of clients: 8
+number of threads: 4
+maximum number of tries: 1
+duration: 600 s
+number of transactions actually processed: 720389
+number of failed transactions: 0 (0.000%)
+latency average = 6.663 ms
+initial connection time = 39.177 ms
+tps = 1200.684968 (without initial connection time)
+```
+
+Видим небольшую разницу в tps, около 5%. Маленькая разница обусловлена высокопроизводительным диском.
+
+Даже при небольшой разнице в моем тесте, нужно учитывать что:
+* Синхронный коммит – при каждом COMMIT транзакции лидер ждёт, пока WAL-записи сбросятся на диск (на master + синхронные реплики, если есть).
+* Асинхронный коммит – транзакция считается зафиксированной, как только WAL записан в буфер ОС (или память), а сброс на диск происходит позже.
+* Цена синхронности – задержка каждого коммита = минимум время одного fsync (миллисекунды), что при коротких транзакциях (pgbench по умолчанию – 1 INSERT/UPDATE) резко снижает TPS.
 
 
+## 7. Задание со звездочкой
+Создадим отдельный контейнер под это задание
+<img width="1495" height="345" alt="image" src="https://github.com/user-attachments/assets/3ee6f57f-d94f-46c5-b5f0-6b44304c7b77" />
 
+Инициализируем кластер с контрольными суммами
+```sql
+postgres@2457467c1dd5:/$ initdb -D /var/lib/postgresql/checksum_cluster --data-checksums
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
 
+The database cluster will be initialized with locale "C.UTF-8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
 
+Data page checksums are enabled.
 
+creating directory /var/lib/postgresql/checksum_cluster ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default "max_connections" ... 100
+selecting default "shared_buffers" ... 128MB
+selecting default time zone ... Etc/UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
 
+initdb: warning: enabling "trust" authentication for local connections
+initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
 
+Success. You can now start the database server using:
 
+    pg_ctl -D /var/lib/postgresql/checksum_cluster -l logfile start
+```
 
+Проверяем включение сумм
+```sql
+postgres=# SHOW data_checksums;
+ data_checksums 
+----------------
+ on
+(1 row)
+```
 
+### 7.1. Создаем таблицу и заполняем данными
+```sql
+CREATE TABLE test_table (
+    id SERIAL PRIMARY KEY,
+    data TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
 
+INSERT INTO test_table (data) 
+SELECT 'Test data ' || generate_series(1, 10000);
+INSERT 0 10000
 
+postgres=# SELECT COUNT(*) FROM test_table;
+ count 
+-------
+ 10000
+(1 row)
+```
+
+Смотрим в каком файле сохранена таблица
+```sql
+postgres=# SELECT pg_relation_filepath('test_table');
+ pg_relation_filepath 
+----------------------
+ base/5/41056
+(1 row)
+```
+
+### 7.2. Имитация повреждения файла таблицы
+Останавливаем кластер
+```sql
+postgres@2457467c1dd5:/$ pg_ctl stop -D /var/lib/postgresql/data
+waiting for server to shut down....2026-04-29 15:37:52.668 UTC [7166] LOG:  received fast shutdown request
+2026-04-29 15:37:52.670 UTC [7166] LOG:  aborting any active transactions
+2026-04-29 15:37:52.671 UTC [7259] FATAL:  terminating connection due to administrator command
+2026-04-29 15:37:52.685 UTC [7166] LOG:  background worker "logical replication launcher" (PID 7172) exited with exit code 1
+2026-04-29 15:37:52.688 UTC [7167] LOG:  shutting down
+2026-04-29 15:37:52.691 UTC [7167] LOG:  checkpoint starting: shutdown immediate
+2026-04-29 15:37:52.743 UTC [7167] LOG:  checkpoint complete: wrote 120 buffers (0.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.006 s, sync=0.033 s, total=0.056 s; sync files=15, longest=0.013 s, average=0.003 s; distance=1612 kB, estimate=1612 kB; lsn=0/1943678, redo lsn=0/1943678
+2026-04-29 15:37:52.757 UTC [7166] LOG:  database system is shut down
+ done
+server stopped
+```
+
+Повреждаем файл
+```sql
+postgres@1163dbb179e0:~/data/base/5$ dd if=/dev/zero of=41056 bs=100 count=1 conv=notrunc
+1+0 records in
+1+0 records out
+100 bytes copied, 0.000356562 s, 280 kB/s
+```
+
+```bash
+WARNING:  page verification failed, calculated checksum mismatch
+ERROR:  invalid page header in block 0 of relation base/5/41056
+```
+
+### 7.3. Корректные варианты действий для продолжения работы
+```sql
+SET ignore_checksum_failure = on;
+SET zero_damaged_pages = on;
+SELECT COUNT(*) FROM test_table;
+WARNING:  page verification failed, calculated checksum mismatch
+ERROR:  invalid page header in block 0 of relation base/5/41056
+```
+### 7.3.1. Извлечь данные не удалось, так как повреждена первая страница
+
+### 7.3.2. Создание резервной копии неповреждённых таблиц
+```sql
+pg_dump -U postgres -t test_table2 > test_table2_backup.sql
+pg_dump: warning: skipping table "test_table" because it does not exist
+```
+
+### 7.3.3. Удаление повреждённой таблицы
+```sql
+DROP TABLE test_table;
+DROP TABLE
+```
+
+Проверка
+```sql
+SELECT table_name FROM information_schema.tables WHERE table_name = 'test_table';
+ table_name 
+------------
+(0 rows)
+```
+
+### 7.3.4. Восстановление таблицы из резервной копии
+```sql
+pg_restore -U postgres -d postgres test_table_backup.dump
+pg_restore: finished successfully
+```
+
+```sql
+SELECT COUNT(*) FROM test_table;
+ count 
+-------
+  1000
+(1 row)
+```
 (1 row)
   
