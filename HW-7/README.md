@@ -183,11 +183,46 @@ docker logs 2457467c1dd5 2>&1 | grep "checkpoint"
 |Соблюдение расписания|	Да (30 сек)|
 
 
+## 6. Сравнение TPS при синхронном и асинхронном коммите
+### 6.1 Прогон 1 (синхронный, стандартный)
+```sql
+postgres=# ALTER SYSTEM SET synchronous_commit = on;
+ALTER SYSTEM
+postgres=# SELECT pg_reload_conf();
+ pg_reload_conf 
+----------------
+ t
+(1 row)
+```
 
+```sql
+postgres@2457467c1dd5:/var/lib$ pgbench -c 8 -j 4 -T 600 pgbench_test
+pgbench (17.9 (Debian 17.9-1.pgdg13+1))
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 100
+query mode: simple
+number of clients: 8
+number of threads: 4
+maximum number of tries: 1
+duration: 600 s
+number of transactions actually processed: 686974
+number of failed transactions: 0 (0.000%)
+latency average = 6.987 ms
+initial connection time = 42.340 ms
+tps = 1145.010106 (without initial connection time)
+```
 
-
-
-
+### 6.2 Прогон 2 (асинхронный)
+```sql
+postgres=# ALTER SYSTEM SET synchronous_commit = off;
+ALTER SYSTEM
+postgres=# SELECT pg_reload_conf();
+ pg_reload_conf 
+----------------
+ t
+(1 row)
+```
 
 
 
