@@ -325,7 +325,7 @@ postgres=# SELECT pg_relation_filepath('test_table');
 ### 7.2. Имитация повреждения файла таблицы
 Останавливаем кластер
 ```sql
-postgres@2457467c1dd5:/$ pg_ctl stop -D /var/lib/postgresql/data
+postgres@2457467c1dd5:/$ pg_ctl stop -D /var/lib/postgresql/checksum_cluster
 waiting for server to shut down....2026-04-29 15:37:52.668 UTC [7166] LOG:  received fast shutdown request
 2026-04-29 15:37:52.670 UTC [7166] LOG:  aborting any active transactions
 2026-04-29 15:37:52.671 UTC [7259] FATAL:  terminating connection due to administrator command
@@ -340,13 +340,15 @@ server stopped
 
 Повреждаем файл
 ```sql
-postgres@1163dbb179e0:~/data/base/5$ dd if=/dev/zero of=41056 bs=100 count=1 conv=notrunc
+postgres@1163dbb179e0:~/checksum_cluster/base/5$ dd if=/dev/zero of=41056 bs=100 count=1 conv=notrunc
 1+0 records in
 1+0 records out
 100 bytes copied, 0.000356562 s, 280 kB/s
 ```
 
-```bash
+```sql
+SELECT * FROM test_table LIMIT 10;
+
 WARNING:  page verification failed, calculated checksum mismatch
 ERROR:  invalid page header in block 0 of relation base/5/41056
 ```
