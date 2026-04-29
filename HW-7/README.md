@@ -11,7 +11,7 @@ root@2457467c1dd5:/# pgbench --version
 pgbench (PostgreSQL) 17.9 (Debian 17.9-1.pgdg13+1)
 ```
 
-Меняем настройки и передергиваем конфигцрационный файл
+Меняем настройки и передергиваем конфигурационный файл
 ```sql
 postgres=# SELECT pg_reload_conf();
  pg_reload_conf 
