@@ -217,3 +217,60 @@ Process 642 waits for ShareLock on transaction 2289744; blocked by process 1321.
 в логах видно pid [1321]
 
 
+## 5. Задание со здвездочко
+Могут ли две транзакции, выполняющие единственную команду UPDATE одной и той же таблицы (без where), заблокировать друг друга?
+
+Воспроизводим ситуацию
+Создаем новую таблицу и заполняем
+```sql
+postgres=# CREATE TABLE test_update (
+    id SERIAL PRIMARY KEY,
+    data TEXT
+);
+CREATE TABLE
+postgres=# INSERT INTO test_update (data) VALUES 
+    ('row1'), ('row2'), ('row3'), ('row4'), ('row5');
+INSERT 0 5
+```
+
+Сессия 1. Апдейтим все строки, не коммитим
+```sql
+postgres=# BEGIN;
+UPDATE test_update SET data = 'updated_by_1';
+BEGIN
+UPDATE 5
+```
+
+Сессия 2. 
+```sql
+postgres=# BEGIN;
+UPDATE test_update SET data = 'updated_by_2';
+BEGIN
+```
+
+Результат: Сессия 2 ждёт, но deadlock не возникает — это просто последовательная блокировка.
+
+В сессии 3 посмотрит что показывает pg_locks
+```sql
+postgres=# SELECT locktype, relation::regclass, page, tuple, mode, granted, pid 
+FROM pg_locks 
+WHERE relation = 'test_update'::regclass OR locktype = 'transactionid'
+ORDER BY pid;
+   locktype    |  relation   | page | tuple |       mode       | granted | pid  
+---------------+-------------+------+-------+------------------+---------+------
+ transactionid |             |      |       | ShareLock        | f       |  274
+ transactionid |             |      |       | ExclusiveLock    | t       |  274
+ transactionid |             |      |       | ExclusiveLock    | t       |  642
+ relation      | test_update |      |       | RowExclusiveLock | t       | 3323
+ transactionid |             |      |       | ExclusiveLock    | t       | 3323
+ tuple         | test_update |    0 |     1 | ExclusiveLock    | t       | 3334
+ transactionid |             |      |       | ExclusiveLock    | t       | 3334
+ relation      | test_update |      |       | RowExclusiveLock | t       | 3334
+ transactionid |             |      |       | ShareLock        | f       | 3334
+(9 rows)
+```
+
+UPDATE без WHERE не создаст deadlock, потому что:
+* Обе транзакции пытаются заблокировать один и тот же набор строк в одинаковом порядке (порядок сканирования таблицы)
+* Блокировки строк приобретаются последовательно, а не циклически
+* PostgreSQL не может обновить строки в разном порядке при UPDATE без WHERE
