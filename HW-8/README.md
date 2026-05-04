@@ -124,3 +124,94 @@ ORDER BY pid, granted;
 |transactionid	ID| транзакции|	ShareLock / ExclusiveLock	|Ожидание завершения чужой транзакции|
 |tuple|	конкретная версия строки	|ExclusiveLock|	Ожидание доступа к физической версии строки|
 |relation|	таблица или индекс|	RowExclusiveLock / AccessShareLock|	Редко бывает granted=f (обычно при DDL)|
+
+
+## 4. Воспроизведение взаимоблокировки трёх транзакций
+Сессия 1
+```sql
+postgres=# BEGIN;
+UPDATE lock_test SET data = '1' WHERE id = 1;
+BEGIN
+UPDATE 1
+```
+
+Сессия 2
+```sql
+postgres=# BEGIN;
+UPDATE lock_test SET data = '2' WHERE id = 2;
+BEGIN
+UPDATE 1
+```
+
+Сессия 3
+```sql
+postgres=# BEGIN;
+UPDATE lock_test SET data = '3' WHERE id = 3;
+BEGIN
+UPDATE 1
+```
+
+## 4.1 Теперь создадим цикл взаимоблокировки:
+* Сессия 1 (уже держит id=1)
+Теперь пытаемся обновить строку, которую держит Сессия 2
+```sql
+UPDATE lock_test SET data = '274_tries_2' WHERE id = 2;
+```
+
+* Сессия 2 (уже держит id=2)
+Теперь пытаемся обновить строку, которую держит Сессия 3
+```sql
+UPDATE lock_test SET data = '642_tries_3' WHERE id = 3;
+```
+
+* Сессия 3 (уже держит id=3)
+Теперь пытаемся обновить строку, которую держит Сессия 1
+```sql
+UPDATE lock_test SET data = '1321_tries_1' WHERE id = 1;
+```
+
+Результат после выполнения команды апдейта в 3 сесси:
+```sql
+ERROR:  deadlock detected
+DETAIL:  Process 1321 waits for ShareLock on transaction 2289740; blocked by process 274.
+Process 274 waits for ShareLock on transaction 2289742; blocked by process 642.
+Process 642 waits for ShareLock on transaction 2289744; blocked by process 1321.
+HINT:  See server log for query details.
+CONTEXT:  while updating tuple (0,3) in relation "lock_test"
+```
+
+* Сессия 1 ждёт Сессию 2
+* Сессия 2 ждёт Сессию 3
+* Сессия 3 ждёт Сессию 1
+
+## 4.2. Разбираемся постфактум
+Что именно можно узнать из журнала
+* Граф ожидания
+```sql
+DETAIL:  Process 1321 waits for ShareLock on transaction 2289740; blocked by process 274.
+Process 274 waits for ShareLock on transaction 2289742; blocked by process 642.
+Process 642 waits for ShareLock on transaction 2289744; blocked by process 1321.
+```
+
+* Какие SQL-запросы выполнялись, через логи контейнера
+```bash 
+2026-05-04 11:45:45.896 UTC [1321] ERROR:  deadlock detected
+2026-05-04 11:45:45.896 UTC [1321] DETAIL:  Process 1321 waits for ShareLock on transaction 2289740; blocked by process 274.
+	Process 274 waits for ShareLock on transaction 2289742; blocked by process 642.
+	Process 642 waits for ShareLock on transaction 2289744; blocked by process 1321.
+	Process 1321: UPDATE lock_test SET data = '1321_tries_1' WHERE id = 1;
+	Process 274: UPDATE lock_test SET data = '274_tries_2' WHERE id = 2;
+	Process 642: UPDATE lock_test SET data = '642_tries_3' WHERE id = 3;
+2026-05-04 11:45:45.896 UTC [1321] HINT:  See server log for query details.
+2026-05-04 11:45:45.896 UTC [1321] CONTEXT:  while updating tuple (0,3) in relation "lock_test"
+2026-05-04 11:45:45.896 UTC [1321] STATEMENT:  UPDATE lock_test SET data = '1321_tries_1' WHERE id = 1;
+2026-05-04 11:45:45.897 UTC [642] LOG:  process 642 acquired ShareLock on transaction 2289744 after 13388.138 ms
+2026-05-04 11:45:45.897 UTC [642] CONTEXT:  while updating tuple (0,8) in relation "lock_test"
+2026-05-04 11:45:45.897 UTC [642] STATEMENT:  UPDATE lock_test SET data = '642_tries_3' WHERE id = 3;
+```
+
+
+
+
+
+
