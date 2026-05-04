@@ -20,3 +20,4 @@
 * [HW-5 Изоляция транзакций](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-5)
 * [HW-6 MVCC, vacuum и autovacuum](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-6)
 * [HW-7 Журналы](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-7)
+* [HW-8 Блокировки](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-8)
