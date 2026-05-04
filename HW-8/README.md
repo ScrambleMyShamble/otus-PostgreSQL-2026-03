@@ -210,8 +210,10 @@ Process 642 waits for ShareLock on transaction 2289744; blocked by process 1321.
 2026-05-04 11:45:45.897 UTC [642] STATEMENT:  UPDATE lock_test SET data = '642_tries_3' WHERE id = 3;
 ```
 
-
-
-
+* Какая транзакция была откачена и время deadlock
+```bash 
+2026-05-04 11:45:45.896 UTC [1321] ERROR:  deadlock detected
+```
+в логах видно pid [1321]
 
 
