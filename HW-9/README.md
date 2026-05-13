@@ -82,7 +82,7 @@ LEFT JOIN customers c ON o.customer_id = c.id;
 Берутся все строки из левой таблицы (orders), а из правой (customers) — только совпадающие.
 Если клиента нет — в колонках c.name будет NULL.
 
-4. Кросс-соединение (CROSS JOIN)
+## 4. Кросс-соединение (CROSS JOIN)
 ``` sql
 postgres=# SELECT c.name, o.order_date
 FROM customers c
