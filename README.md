@@ -21,3 +21,4 @@
 * [HW-6 MVCC, vacuum и autovacuum](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-6)
 * [HW-7 Журналы](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-7)
 * [HW-8 Блокировки](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-8)
+* [HW-7 Выборка данных, виды join'ов. Применение и оптимизация](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-9)
