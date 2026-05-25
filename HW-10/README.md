@@ -113,9 +113,107 @@ WHERE search_vector @@ to_tsquery('russian', 'technical & specifications');
 (11 rows)
 ```
 
+## 4. Индекс на часть таблицы (частичный индекс)
+```sql
+CREATE INDEX idx_active_high_price ON products(price) 
+WHERE is_active = true AND price > 100;
+CREATE INDEX
+```
+
+Запрос, использующий частичный индекс
+```sql
+EXPLAIN ANALYZE 
+SELECT * FROM products 
+WHERE is_active = true AND price > 100 AND price < 300;
+
+ Bitmap Heap Scan on products  (cost=44.24..633.13 rows=2059 width=238) (actual time=0.477..0.985 rows=2057 loops=1)
+   Recheck Cond: ((price < '300'::numeric) AND is_active AND (price > '100'::numeric))
+   Heap Blocks: exact=345
+   ->  Bitmap Index Scan on idx_active_high_price  (cost=0.00..43.73 rows=2059 width=0) (actual time=0.439..0.440 rows=2057 loops=1)
+         Index Cond: (price < '300'::numeric)
+ Planning Time: 0.326 ms
+ Execution Time: 1.061 ms
+(7 rows)
+```
+
+Индекс на поле с функцией
+```sql
+CREATE INDEX idx_lower_name ON products(LOWER(name));
+CREATE INDEX
+```
+
+Запрос, использующий функциональный индекс
+```sql
+postgres=# EXPLAIN ANALYZE 
+SELECT * FROM products 
+WHERE LOWER(name) = 'product 500';
+                                                       QUERY PLAN                                                       
+------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on products  (cost=4.67..155.19 rows=50 width=238) (actual time=0.115..0.116 rows=1 loops=1)
+   Recheck Cond: (lower((name)::text) = 'product 500'::text)
+   Heap Blocks: exact=1
+   ->  Bitmap Index Scan on idx_lower_name  (cost=0.00..4.66 rows=50 width=0) (actual time=0.102..0.102 rows=1 loops=1)
+         Index Cond: (lower((name)::text) = 'product 500'::text)
+ Planning Time: 2.409 ms
+ Execution Time: 0.174 ms
+(7 rows)
+```
+
+## 5. Составной индекс (на несколько полей)
+```sql
+CREATE INDEX idx_category_price ON products(category, price);
+CREATE INDEX
+```
+
+Запрос, использующий составной индекс
+```sql
+EXPLAIN (ANALYZE, BUFFERS) 
+SELECT * FROM products 
+WHERE category = 'Electronics' AND price BETWEEN 200 AND 500;
+
+Bitmap Heap Scan on products  (cost=19.92..612.26 rows=599 width=238) (actual time=0.406..0.955 rows=608 loops=1)
+   Recheck Cond: (((category)::text = 'Electronics'::text) AND (price >= '200'::numeric) AND (price <= '500'::numeric))
+   Heap Blocks: exact=303
+   Buffers: shared hit=303 read=5
+   ->  Bitmap Index Scan on idx_category_price  (cost=0.00..19.77 rows=599 width=0) (actual time=0.257..0.257 rows=608 loops=1)
+         Index Cond: (((category)::text = 'Electronics'::text) AND (price >= '200'::numeric) AND (price <= '500'::numeric))
+         Buffers: shared read=5
+ Planning:
+   Buffers: shared hit=33 read=1 dirtied=3
+ Planning Time: 0.839 ms
+ Execution Time: 1.026 ms
+(11 rows)
+```
+
+Составной индекс с сортировкой
+```sql
+CREATE INDEX idx_category_price_stock ON products(category, price DESC, stock_quantity);
+CREATE INDEX
+```
+
+Запрос для сложной фильтрации
+```sql
+EXPLAIN ANALYZE 
+SELECT * FROM products 
+WHERE category = 'Books' 
+  AND price < 50 
+  AND stock_quantity > 10 
+ORDER BY price DESC;
+
+ Sort  (cost=263.60..263.82 rows=88 width=238) (actual time=0.194..0.198 rows=91 loops=1)
+   Sort Key: price DESC
+   Sort Method: quicksort  Memory: 48kB
+   ->  Bitmap Heap Scan on products  (cost=5.29..260.76 rows=88 width=238) (actual time=0.072..0.167 rows=91 loops=1)
+         Recheck Cond: (((category)::text = 'Books'::text) AND (price < '50'::numeric))
+         Filter: (stock_quantity > 10)
+         Rows Removed by Filter: 8
+         Heap Blocks: exact=90
+         ->  Bitmap Index Scan on idx_category_price  (cost=0.00..5.27 rows=98 width=0) (actual time=0.055..0.056 rows=99 loops=1)
+               Index Cond: (((category)::text = 'Books'::text) AND (price < '50'::numeric))
+ Planning Time: 0.170 ms
+ Execution Time: 0.219 ms
+(12 rows)
+```
 
 
 
-
-
-    
