@@ -71,15 +71,47 @@ EXPLAIN ANALYZE SELECT * FROM products WHERE price BETWEEN 100 AND 500;
 ```
 
 ## 3. Индекс для полнотекстового поиска
+```sql
+CREATE INDEX idx_products_search ON products USING GIN(search_vector);
+CREATE INDEX
+```
 
+Запрос с полнотекстовым поиском
+```sql
+EXPLAIN ANALYZE 
+SELECT * FROM products 
+WHERE search_vector @@ to_tsquery('russian', 'description & features');
 
+ Bitmap Heap Scan on products  (cost=86.40..769.39 rows=10000 width=238) (actual time=2.741..5.506 rows=10000 loops=1)
+   Recheck Cond: (search_vector @@ '''descript'' & ''featur'''::tsquery)
+   Heap Blocks: exact=346
+   ->  Bitmap Index Scan on idx_products_search  (cost=0.00..83.90 rows=10000 width=0) (actual time=2.654..2.655 rows=10000 loops=1)
+         Index Cond: (search_vector @@ '''descript'' & ''featur'''::tsquery)
+ Planning Time: 0.418 ms
+ Execution Time: 6.410 ms
+(7 rows)
+```
 
+Показываем использование индекса
+```sql
+EXPLAIN (ANALYZE, BUFFERS) 
+SELECT id, name, description 
+FROM products 
+WHERE search_vector @@ to_tsquery('russian', 'technical & specifications');
 
-
-
-
-
-
+ Bitmap Heap Scan on products  (cost=86.40..769.39 rows=10000 width=101) (actual time=2.037..3.563 rows=10000 loops=1)
+   Recheck Cond: (search_vector @@ '''technic'' & ''specif'''::tsquery)
+   Heap Blocks: exact=346
+   Buffers: shared hit=357
+   ->  Bitmap Index Scan on idx_products_search  (cost=0.00..83.90 rows=10000 width=0) (actual time=1.989..1.990 rows=10000 loops=1)
+         Index Cond: (search_vector @@ '''technic'' & ''specif'''::tsquery)
+         Buffers: shared hit=11
+ Planning:
+   Buffers: shared hit=1
+ Planning Time: 0.225 ms
+ Execution Time: 4.081 ms
+(11 rows)
+```
 
 
 
