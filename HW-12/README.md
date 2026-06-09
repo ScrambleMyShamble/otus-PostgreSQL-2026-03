@@ -56,7 +56,7 @@ Tables:
 ```bash
 sudo nano /etc/postgresql/16/main/postgresql.conf
 ```
-Интересуют нас следующие параметры
+Интересуют нас следующие параметры<br>
 listen_addresses = '*'<br> 
 wal_level = logical<br>
 max_replication_slots = 10<br>
