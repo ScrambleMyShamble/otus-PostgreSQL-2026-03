@@ -23,3 +23,4 @@
 * [HW-8 Блокировки](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-8)
 * [HW-9 Выборка данных, виды join'ов. Применение и оптимизация](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-9)
 * [HW-10 Виды индексов](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-10)
+* [HW-11 Резервное копирование и восстановление](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-11)
