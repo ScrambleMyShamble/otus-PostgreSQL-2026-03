@@ -26,7 +26,8 @@ docker run -d \
   postgres:16
 ```
 
-### 2. Подключение и создание схемы/таблиц
+### 2. Подключение, создание схемы/таблиц и заполнение
+Создаем
 ```sql
 $ docker exec -it postgres_backup_lab psql -U postgres -d test_db
 
@@ -51,8 +52,20 @@ test_db=# CREATE TABLE my_schema.table2 (
 CREATE TABLE
 ```
 
+Заполняем
+```sql
+INSERT INTO my_schema.table1 (data)
+SELECT 'Row data #' || g
+FROM generate_series(1, 100) AS g;
 
+INSERT 0 100
 
+SELECT COUNT(*) FROM my_schema.table1;
+ count 
+-------
+   100
+(1 row)
+```
 
 
 
