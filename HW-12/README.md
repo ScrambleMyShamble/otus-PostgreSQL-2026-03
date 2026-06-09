@@ -57,10 +57,10 @@ Tables:
 sudo nano /etc/postgresql/16/main/postgresql.conf
 ```
 Интересуют нас следующие параметры
-listen_addresses = '*'
-wal_level = logical
-max_replication_slots = 10
-max_wal_senders = 10
+listen_addresses = '*'<br> 
+wal_level = logical<br>
+max_replication_slots = 10<br>
+max_wal_senders = 10<br>
 
 и рестартуем кластер
 ```bash
