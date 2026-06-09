@@ -67,9 +67,15 @@ SELECT COUNT(*) FROM my_schema.table1;
 (1 row)
 ```
 
+### 3. Создание каталога для бэкапов
+``` bash
+$ sudo mkdir -p /var/lib/postgresql/backups
 
+$ sudo chown postgres:postgres /var/lib/postgresql/backups
 
-
+$ ls -ld /var/lib/postgresql/backups
+drwxr-xr-x 2 postgres postgres 4096 Jun  9 10:25 /var/lib/postgresql/backups
+```
 
 
 
