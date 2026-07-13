@@ -97,16 +97,30 @@ INSERT INTO bookings_partitioned (book_ref, book_date, total_amount)
 SELECT book_ref, book_date, total_amount
 FROM bookings.bookings
 WHERE book_date >= '2025-01-01' AND book_date < '2026-01-01';
-
+Updated Rows 1292893
+```
+Запись в лог
+``` sql
+INSERT INTO migration_log (table_name, records_moved) 
+VALUES ('bookings', (SELECT COUNT(*) FROM bookings.bookings));
 ```
 
+Проверяем распределение данных по секциям
+``` sql
+SELECT 
+    tableoid::regclass AS partition,
+    COUNT(*) AS row_count,
+    MIN(book_date) AS min_date,
+    MAX(book_date) AS max_date
+FROM bookings_partitioned
+GROUP BY tableoid
+ORDER BY partition;
 
-
-
-
-
-
-
+bookings_2025_09	446319	2025-09-01 03:00:06.265 +0300	2025-09-30 23:59:53.923 +0300
+bookings_2025_10	434287	2025-10-01 00:00:03.529 +0300	2025-10-31 23:59:48.434 +0300
+bookings_2025_11	410680	2025-11-01 00:00:01.030 +0300	2025-11-30 23:59:59.941 +0300
+bookings_2025_12	1607	2025-12-01 00:00:23.471 +0300	2025-12-01 02:59:28.616 +0300
+```
 
 
 
