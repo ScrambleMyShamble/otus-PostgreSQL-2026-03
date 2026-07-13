@@ -25,3 +25,4 @@
 * [HW-10 Виды индексов](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-10)
 * [HW-11 Резервное копирование и восстановление](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-11)
 * [HW-12 Виды и устройство репликации в PostgreSQL](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-12)
+* [HW-13 Секционирование](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-13)
