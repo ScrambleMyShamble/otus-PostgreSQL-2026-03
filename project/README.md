@@ -203,12 +203,12 @@ sudo -u patroni /opt/patroni/venv/bin/pip install --upgrade pip setuptools wheel
 ```bash
 sudo -u patroni /opt/patroni/venv/bin/pip install patroni[etcd3]
 ```
-![pack2](pytho_pack_2.png)
+![pack2](python_pack_2.png)
 
 ```bash
 sudo -u patroni /opt/patroni/venv/bin/pip install etcd3 psycopg2-binary
 ```
-![pack3](pytho_pack_3.png)
+![pack3](python_pack_3.png)
 
 
 Итоговый список пакетов для кластера Patroni
