@@ -182,29 +182,32 @@ sudo usermod -a -G postgres patroni
 sudo -u patroni python3 -m venv /opt/patroni/venv
 ```
 Получаем ошибку
-вставить ошибку скрин
+![enverror](pythno_env_error.png)
 
-нет python3-venv
-Нужно установить пакет python3-venv.
+Нет python3-venv, установиливаем пакет.
 ```bash
 sudo apt update
 sudo apt install python3-venv python3-pip -y
-
+```
 После утсановки пробуем еще раз
 ```bash
 sudo -u patroni python3 -m venv /opt/patroni/venv
-ОШибка исчезла
+```
+Ошибка исчезла
 
 Установка Patroni в виртуальное окружение
 ```bash
 sudo -u patroni /opt/patroni/venv/bin/pip install --upgrade pip setuptools wheel
+```
 вставить скрин
 ```bash
 sudo -u patroni /opt/patroni/venv/bin/pip install patroni[etcd3]
+```
 скрин
 
 ```bash
 sudo -u patroni /opt/patroni/venv/bin/pip install etcd3 psycopg2-binary
+```
 скрин
 
 
@@ -219,7 +222,7 @@ sudo -u patroni /opt/patroni/venv/bin/pip install etcd3 psycopg2-binary
 ```bash
 sudo touch /etc/patroni/patroni.yml
 sudo nano /etc/patroni/patroni.yml
-
+```
 Вставить код файла
 
 Выдать права сразу на файл конфига
