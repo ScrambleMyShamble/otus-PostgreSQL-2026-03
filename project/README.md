@@ -127,13 +127,150 @@ ETCD кластер готов, можно продолжать, но в доп�
 Отлично, etcd настроен + gui через контейнер для удобства отображения ключей.
 
 
-## 7. Настройка Patroni и PostgreSQL
+## 8. Установка PostgreSQL
 Не буду расписывать установку субд на всех 3 нодах кластера, так как это тривиальная задача, уточню лишь, что после установки нужно остановить службу PostgreSQL и удалить директорию с данными main, для последующей настройки Patroni.
+![postgresstatus](postgres-status.png)
+
+
+## 9. Установка Patroni
+Создание структуры директорий
+```bash
+sudo mkdir -p /etc/patroni - файл конфига
+sudo mkdir /var/log/patroni/ - файл логов
+sudo mkdir -p /var/lib/patroni - метаданные и состояние
+sudo mkdir -p /opt/patroni/venv - Создаем корневую директорию Patroni
+```
+Очистка PostgreSQL (если есть существующий кластер)
+```bash
+sudo rm -rf /var/lib/postgresql/17/main - Patroni ожидает **пустую** директорию данных, чтобы создать новый кластер
+```
+Создание пользователя и группы Patroni и назначаем права
+```bash
+sudo groupadd -r patroni - системную группу patroni
+```
+
+Настройка прав
+```bash
+sudo chown -R patroni:patroni /etc/patroni
+sudo chown -R patroni:patroni /opt/patroni
+sudo chown -R patroni:patroni /var/lib/patroni
+sudo chown -R patroni:patroni /var/log/patroni
+```
+Права на директории Patroni
+```bash
+sudo chmod 755 /etc/patroni
+sudo chmod 755 /opt/patroni
+sudo chmod 755 /var/lib/patroni
+sudo chmod 755 /var/log/patroni
+```
+
+
+Создание и настройка директории PostgreSQL
+```bash
+sudo mkdir -p /var/lib/postgresql/17/main
+sudo chown -R patroni:patroni /var/lib/postgresql/17/main
+sudo chmod 700 /var/lib/postgresql/17/main
+```
+
+Добавляем patroni в группу postgres (для доступа к бинарникам)
+```bash
+sudo usermod -a -G postgres patroni
+```
+
+Создание виртуального окружения
+```bash
+sudo -u patroni python3 -m venv /opt/patroni/venv
+```
+Получаем ошибку
+вставить ошибку скрин
+
+нет python3-venv
+Нужно установить пакет python3-venv.
+```bash
+sudo apt update
+sudo apt install python3-venv python3-pip -y
+
+После утсановки пробуем еще раз
+```bash
+sudo -u patroni python3 -m venv /opt/patroni/venv
+ОШибка исчезла
+
+Установка Patroni в виртуальное окружение
+```bash
+sudo -u patroni /opt/patroni/venv/bin/pip install --upgrade pip setuptools wheel
+вставить скрин
+```bash
+sudo -u patroni /opt/patroni/venv/bin/pip install patroni[etcd3]
+скрин
+
+```bash
+sudo -u patroni /opt/patroni/venv/bin/pip install etcd3 psycopg2-binary
+скрин
+
+
+Итоговый список пакетов для кластера Patroni
+**etcd3              0.12.0**
+**patroni            4.1.3**
+**psycopg2-binary    2.9.12
 
 
 
+Создание конфигурационного файла Patroni
+```bash
+sudo touch /etc/patroni/patroni.yml
+sudo nano /etc/patroni/patroni.yml
+
+Вставить код файла
+
+Выдать права сразу на файл конфига
+```bash
+sudo chown patroni:patroni /etc/patroni/patroni.yml
+sudo chmod 640 /etc/patroni/patroni.yml
 
 
+Создание файла .pgpass
+Создаем файл .pgpass для автоматической аутентификации в PostgreSQL
+
+вставить код из файла
+
+
+Устанавливаем правильные права (только владелец может читать/писать)
+```bash
+sudo chmod 600 /var/lib/patroni/.pgpass
+sudo chown patroni:patroni /var/lib/patroni/.pgpass
+
+
+
+Создание systemd сервиса
+```bash
+sudo nano /etc/systemd/system/patroni.service
+вставить код из файла
+
+
+Проделываем все шаги на остальных нодах
+
+Пробуем запустить кластер патрони, неудачно, смотри ошибку
+На pg-master машине
+скрин
+На pg-replica1
+скрин
+
+Хотя pg-replica2 запустилась
+скрин
+
+Значит дело только в реплике1, проверяем
+
+Cмотрим патрони_лист, не видим одну из реплик
+Смотрим логи на pg-replica1 и видим следующее.
+скрин
+Проверяем конфиг, видим что в конфиге на pg-replica1, указано name:pg-master, а должно быть
+pg-replica1, исправляем и перезапускаем на ноде
+успех
+скрин с реплики
+скрин с мастера с 3 нодами в листе
+
+
+Кластер patroni установлен, все 3 ноды видны и работают
 
 
 
