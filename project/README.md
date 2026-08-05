@@ -315,7 +315,7 @@ postgresql:
 
 
 Выдать права сразу на файл конфига
-```yaml
+```yml
 sudo chown patroni:patroni /etc/patroni/patroni.yml
 sudo chmod 640 /etc/patroni/patroni.yml
 ```
@@ -324,24 +324,105 @@ sudo chmod 640 /etc/patroni/patroni.yml
 Создаем файл .pgpass для автоматической аутентификации в PostgreSQL
 
 ```yaml
-
+localhost:*:*:postgres:postgres
+192.168.244.133:*:*:postgres:postgres
 ```
+
 Устанавливаем правильные права (только владелец может читать/писать)
 ```bash
 sudo chmod 600 /var/lib/patroni/.pgpass
 sudo chown patroni:patroni /var/lib/patroni/.pgpass
-
+```
 
 
 Создание systemd сервиса
 ```bash
 sudo nano /etc/systemd/system/patroni.service
-вставить код из файла
+```
+
+```yml
+# Создаем systemd unit файл для Patroni
+# systemd - система инициализации и управления сервисами
+[Unit]
+# Описание сервиса
+Description=Patroni HA PostgreSQL Cluster
+# Ссылка на документацию
+Documentation=https://patroni.readthedocs.io/
+# Сервис запускается после сети и etcd
+After=network.target etcd.service
+# Желательно запустить вместе с etcd
+Wants=etcd.service
+# Запускаем до PostgreSQL (Patroni управляет PostgreSQL)
+Before=postgresql.service
+
+[Service]
+# Тип сервиса - простой процесс
+Type=simple
+# Запуск от пользователя patroni (НЕ postgres!)
+User=patroni
+Group=patroni
+# Рабочая директория
+WorkingDirectory=/var/lib/patroni
+
+# Переменные окружения
+# PATH - сначала venv, потом системные пути
+# Environment="PATH=/opt/patroni/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+# Environment="PATH=/opt/patroni/venv/bin:/usr/lib/postgresql/17/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="PATH=/opt/patroni/venv/bin:/usr/lib/postgresql/17/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="HOME=/var/lib/patroni"
+Environment="PGPASSFILE=/var/lib/patroni/.pgpass"
+Environment="PATRONI_SCOPE=postgres-cluster"
+Environment="PYTHONUNBUFFERED=1"
+Environment="TZ=UTC"
+
+# Команда запуска - полный путь к patroni в venv
+ExecStart=/opt/patroni/venv/bin/patroni /etc/patroni/patroni.yml
+# Перезагрузка конфигурации (сигнал HUP)
+ExecReload=/bin/kill -s USR1 $MAINPID
+
+# Управление процессом
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+# Стратегия перезапуска
+Restart=on-failure
+RestartSec=10
+StartLimitBurst=3
+StartLimitIntervalSec=60
+
+# Ограничения ресурсов
+LimitNOFILE=65536
+LimitNPROC=65536
+TasksMax=infinity
+MemoryHigh=2G
+MemoryMax=4G
+
+# Логирование
+SyslogIdentifier=patroni
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+# Автозапуск при загрузке системы
+WantedBy=multi-user.target
+```
 
 
-Проделываем все шаги на остальных нодах
+Проделываем все шаги на остальных нодах.
 
-Пробуем запустить кластер патрони, неудачно, смотри ошибку
+Запускаем ластер патрони
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable patroni
+sudo systemctl start patroni
+```
+И проверяем статус
+```bash
+sudo systemctl status patroni
+```
+
+неудачно, смотри ошибку
 На pg-master машине
 скрин
 На pg-replica1
