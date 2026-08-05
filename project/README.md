@@ -422,28 +422,27 @@ sudo systemctl start patroni
 sudo systemctl status patroni
 ```
 
-неудачно, смотри ошибку
+Кластер запустился, но на 2 нодах, одна из реплик выдала ошибку
+![ptrn_error](patroni_error.png)
+
 На pg-master машине
-скрин
+![ptrn_error_mstr](patroni_log_error.png)
+
 На pg-replica1
-скрин
+![ptrn_error_node1](patroni_node_failed.png)
 
 Хотя pg-replica2 запустилась
-скрин
+![ptrn_node2_ok](patroni_cluster_list_2node.png)
 
-Значит дело только в реплике1, проверяем
+Значит дело только в pg-replica1, проверяем.
+В логах видим ошибку, что нода с названием pg-master уже запущена.
 
-Cмотрим патрони_лист, не видим одну из реплик
-Смотрим логи на pg-replica1 и видим следующее.
-скрин
-Проверяем конфиг, видим что в конфиге на pg-replica1, указано name:pg-master, а должно быть
-pg-replica1, исправляем и перезапускаем на ноде
-успех
-скрин с реплики
-скрин с мастера с 3 нодами в листе
+При проверке конфига на pg-replica1, допустил ошибку, забыл переименовать имя ноды, было указано name:pg-master, а должно быть
+pg-replica1, исправляем и перезапускаем.
 
+![ptrn_node3_ok](patroni_cluster_3node.png)
 
-Кластер patroni установлен, все 3 ноды видны и работают
+Кластер patroni установлен, все 3 ноды видны и работают.
 
 
 
