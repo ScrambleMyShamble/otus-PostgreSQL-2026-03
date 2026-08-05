@@ -55,33 +55,50 @@
 sudo useradd -r -s /usr/sbin/nologin -M etcd
 ```
 6.2. создаем директории 
+```bash
 sudo mkdir -p /opt/etcd/3.5.16/{bin,data,logs,scripts}
-6.3. создаем переменную окружения 
+```
+6.3. создаем переменную окружения
+```bash
 ETCD_VER="v3.5.16"
-6.4. скачиваем бинарники 
+```
+6.4. скачиваем бинарники
+```bash
 wget https://github.com/etcd-io/etcd/releases/download/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz
+```
 6.5. устанавливаем
+```bash
 tar xzvf etcd-${ETCD_VER}-linux-amd64.tar.gz
-6.6. перемещаем в нужную директорию 
+```
+6.6. перемещаем в нужную директорию
+```bash
 sudo cp etcd-${ETCD_VER}-linux-amd64/etcd* /opt/etcd/3.5.16/bin/
-6.7. выдаем права и на запуск 
+```
+6.7. выдаем права и на запуск
+```bash
 sudo chmod +x /opt/etcd/3.5.16/bin/*
 sudo chown -R root:root /opt/etcd/3.5.16/bin
 sudo chown -R etcd:etcd /opt/etcd/3.5.16/data
 sudo chown -R etcd:etcd /opt/etcd/3.5.16/logs
-6.8. бинарники больше не нужны - удаляем 
+```
+6.8. бинарники больше не нужны - удаляем
+```bash
 rm -rf etcd-${ETCD_VER}-linux-amd64 etcd-${ETCD_VER}-linux-amd64.tar.gz
-6.9. настройка симлинков 
+```
+6.9. настройка симлинков
+```bash
 sudo ln -sf /opt/etcd/3.5.16/bin/etcd /usr/local/bin/etcd
 sudo ln -sf /opt/etcd/3.5.16/bin/etcdctl /usr/local/bin/etcdctl
+```
 6.10. Настройка etcd конфига
+```bash
 sudo mkdir -p /etc/etcd - создаем папку
 sudo touch /etc/etcd/etcd.conf
 sudo chown root:root /etc/etcd/etcd.conf
 sudo chmod 644 /etc/etcd/etcd.conf
 sudo nano /etc/etcd/etcd.conf
+```
 
-вставить скрин конфига
 
 6.11. Cервисный файл, одинаковый для всех нод кластера
 вставить скрин сервисного файла
