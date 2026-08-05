@@ -199,7 +199,7 @@ sudo -u patroni python3 -m venv /opt/patroni/venv
 ```bash
 sudo -u patroni /opt/patroni/venv/bin/pip install --upgrade pip setuptools wheel
 ```
-![pack1](pytho_pack_1.png)
+![pack1](python_pack_1.png)
 ```bash
 sudo -u patroni /opt/patroni/venv/bin/pip install patroni[etcd3]
 ```
