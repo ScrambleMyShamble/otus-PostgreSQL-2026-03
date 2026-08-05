@@ -115,8 +115,9 @@ sudo systemctl start etcd
 ```
 
 Проверяем
+```bash
 sudo systemctl status etcd
-
+```
 ![etcdcluster](etcd_cluster.png)
 
 ETCD кластер готов, можно продолжать, но в дополнение установим docker контейнер для удобного отображения etcd и его данных - etcdkeeper.
