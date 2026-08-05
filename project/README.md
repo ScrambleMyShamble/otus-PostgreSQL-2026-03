@@ -98,9 +98,11 @@ sudo chown root:root /etc/etcd/etcd.conf
 sudo chmod 644 /etc/etcd/etcd.conf
 sudo nano /etc/etcd/etcd.conf
 ```
+
 ![etcdconfig](etcd_config.png)
 
 6.11. Cервисный файл, одинаковый для всех нод кластера
+
 ![etcdservice](etcd_service.png)
 
 Проделываем на всех 3 нодах, подставляя данные настраиваемой ноды
