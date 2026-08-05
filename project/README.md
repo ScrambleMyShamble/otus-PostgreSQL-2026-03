@@ -212,31 +212,120 @@ sudo -u patroni /opt/patroni/venv/bin/pip install etcd3 psycopg2-binary
 
 
 Итоговый список пакетов для кластера Patroni
-**etcd3              0.12.0**
-**patroni            4.1.3**
-**psycopg2-binary    2.9.12
-
-
+* etcd3
+* patroni
+* psycopg2-binary
 
 Создание конфигурационного файла Patroni
 ```bash
 sudo touch /etc/patroni/patroni.yml
 sudo nano /etc/patroni/patroni.yml
 ```
-Вставить код файла
+
+```yml
+# ================================================================
+# КОНФИГУРАЦИЯ PATRONI
+# ================================================================
+# Файл: /etc/patroni/patroni.yml
+# Описание: Управление PostgreSQL кластером через etcd
+
+# --- ОСНОВНЫЕ НАСТРОЙКИ КЛАСТЕРА ---
+
+# scope: Уникальное имя кластера (должно быть одинаковым на всех нодах)
+scope: postgres-cluster
+
+# namespace: Префикс в etcd для хранения данных Patroni
+namespace: /db/
+
+# name: Уникальное имя текущей ноды (разное на каждой ноде!)
+name: pg-replica2
+
+# --- НАСТРОЙКИ REST API ---
+# Patroni предоставляет REST API для мониторинга и управления
+
+restapi:
+  # listen: Адрес и порт для прослушивания API
+  listen: 0.0.0.0:8008
+  # connect_address: Адрес, который сообщается другим нодам
+  connect_address: 192.168.244.133:8008
+
+# --- НАСТРОЙКИ ETCD (DCS) ---
+# etcd используется как распределенное хранилище конфигурации
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      parameters:
+        max_connections: 100
+        max_wal_senders: 10
+        wal_level: replica
+        hot_standby: on
+        password_encryption: scram-sha-256
+
+etcd3:
+  # hosts: Список всех нод etcd кластера
+  hosts:
+    - 192.168.244.131:2379
+    - 192.168.244.132:2379
+    - 192.168.244.133:2379
+
+# --- НАСТРОЙКИ POSTGRESQL ---
+
+postgresql:
+  # listen: Адрес для прослушивания PostgreSQL
+  listen: 192.168.244.133:5432
+  # connect_address: Адрес для подключения с других нод
+  connect_address: 192.168.244.133:5432
+  # data_dir: Директория с данными PostgreSQL
+  data_dir: /var/lib/postgresql/17/main
+  # bin_dir: Директория с бинарниками PostgreSQL
+  bin_dir: /usr/lib/postgresql/17/bin
+  # pgpass: Путь к файлу с паролями для подключения
+  pgpass: /var/lib/patroni/.pgpass
+  use_pg_rewind: true
+  remove_data_directory_on_rewind_failure: true
+
+  pg_hba:
+    - local all all peer
+    - host all all 0.0.0.0/0 scram-sha-256
+    - host replication replicator 0.0.0.0/0 scram-sha-256
+
+  # --- АУТЕНТИФИКАЦИЯ В POSTGRESQL ---
+  # ВНИМАНИЕ: Это РОЛИ PostgreSQL, а НЕ системные пользователи!
+  authentication:
+    # superuser: Суперпользователь для управления кластером
+    superuser:
+      username: postgres
+      password: postgres
+    # replication: Пользователь для репликации
+    replication:
+      username: replicator
+      password: replicator
+    # rewind: Пользователь для pg_rewind
+    rewind:
+      username: rewind_user
+      password: rewind_user
+```
+
+
 
 Выдать права сразу на файл конфига
-```bash
+```yaml
 sudo chown patroni:patroni /etc/patroni/patroni.yml
 sudo chmod 640 /etc/patroni/patroni.yml
-
+```
 
 Создание файла .pgpass
 Создаем файл .pgpass для автоматической аутентификации в PostgreSQL
 
-вставить код из файла
+```yaml
 
-
+```
 Устанавливаем правильные права (только владелец может читать/писать)
 ```bash
 sudo chmod 600 /var/lib/patroni/.pgpass
