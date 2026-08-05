@@ -98,23 +98,24 @@ sudo chown root:root /etc/etcd/etcd.conf
 sudo chmod 644 /etc/etcd/etcd.conf
 sudo nano /etc/etcd/etcd.conf
 ```
-
+![etcdconfig](etcd_config.png)
 
 6.11. Cервисный файл, одинаковый для всех нод кластера
-вставить скрин сервисного файла
+![etcdservice](etcd_service.png)
 
 Проделываем на всех 3 нодах, подставляя данные настраиваемой ноды
 
 и запускаем etcd на всех 3 нодах
+```bash
 sudo systemctl daemon-reload
 sudo systemctl enable etcd
 sudo systemctl start etcd
+```
 
 Проверяем
 sudo systemctl status etcd
 
-вставить скрин
+![etcdcluster](etcd_cluster.png)
 
 ETCD кластер готов, можно продолжать, но в дополнение установим docker контейнер для удобного отображения etcd и его данных - etcdkeeper.
 
-вставить скрин из портейнера и etcd gui
