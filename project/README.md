@@ -492,12 +492,12 @@ sudo systemctl restart haproxy keepalived
 Чтобы HAProxy мог успешно проверять состояние реплик, нужно добавить разрешающую строку в файл pg_hba.conf
 Добавляем и проверяем еще раз
 
+![pghba](pghbaconf.png)
 
-
-Нет, все равно реплики down, капаем дальше.
+Не помогло, все равно реплики down, капаем дальше.
 Заменим в конфиге haproxy в блоке listen postgres_primary, строку httpchk GET /primary на option tcp-check
-ПРоверяем
-скрин
+Проверяем
+![haproxy_all_ok](haproxy_gui_allok.png)
 работает
 Что сделали: option tcp-check проверяет только открытый порт (5432), а httpchk проверял HTTP-ответ от Patroni (порт 8008).
 Как только вы переключили проверку на TCP, HAProxy просто убедился, что порт базы открыт, и сразу поднял реплики в UP.
