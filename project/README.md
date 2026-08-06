@@ -411,7 +411,7 @@ WantedBy=multi-user.target
 
 Проделываем все шаги на остальных нодах.
 
-Запускаем ластер патрони
+Запускаем кластер патрони
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable patroni
@@ -441,10 +441,6 @@ sudo systemctl status patroni
 pg-replica1, исправляем и перезапускаем.
 
 ![ptrn_node3_ok](patroni_cluster_3node.png)
-
-Удобное отображение через docker контейнер ivory
-
-![ivory](ivory.png)
 
 Кластер patroni установлен, все 3 ноды видны и работают.
 
@@ -557,8 +553,68 @@ sudo systemctl stop patroni
 
 Ошибок нет, HAProxy шлет запросы только на рабочие ноды
 
+## 12. Docker контейнеры для удобства отображения etcd и patroni кластеров
+Будем использовать всего 2 контейнера - etcdkeeper и ivory.
 
-## 12. Подытожим
+![sacks](stacks.png)
+
+ETCD-keeper
+
+```yml
+services:
+  etcd-browser:
+    image: evildecay/etcdkeeper
+    container_name: etcd-browser
+    ports:
+      - "8080:8080"
+    environment:
+      - ETCD_ENDPOINTS=http://192.168.244.131:2379,http://192.168.244.132:2379,http://192.168.244.133:2379
+    restart: unless-stopped
+```
+
+Ivory
+
+```yml
+volumes:
+  data:
+    driver: local
+
+networks:
+  network:
+    driver: overlay
+    attachable: true
+
+services:
+  webserver:
+    image: 'veegres/ivory:v1.4.1'
+    hostname: 'ivory-webserver'
+    container_name: ivory_webserver
+    networks:
+      - network
+    ports:
+      - '8085:80'
+    environment:
+      - IVORY_URL_PATH=/ivory
+      - TZ=Europe/Moscow
+    volumes:
+      - data:/opt/ivory/data
+    deploy:
+      placement:
+        constraints:
+          - 'node.labels.TAG==ivory'
+    restart: always
+```
+
+Наш кластер patroni в удобной GUI
+
+![ivory](ivory.png)
+
+И etcd
+
+![etcd_last](etcd_gui_last.png)
+
+
+## 13. Подытожим
 
 Успешно развёрнут отказоустойчивый кластер PostgreSQL 17
 
@@ -575,7 +631,7 @@ sudo systemctl stop patroni
 Отказоустойчивость балансировщиков (Keepalived).
 
 
-## 13. Что не успел/планы на развитие кластера.
+## 14. Что не успел/планы на развитие кластера.
 * Основное это прикрутить мониторинг и алерты - grafana + zabbix.
 * Резервное копирование 
 * Автоматизация через ansible
