@@ -524,25 +524,31 @@ sudo systemctl stop patroni
 ```
 
 Видим что лидер сменился
+
 ![maser_patron_stop](patroni_cluster_1node_stopped.png)
 
 
 Вернем ноду в кластер видим что бывший лидер вернулся и стал репликой, бывшая реплика стала мастером
+
 ![maser_patron_change](patroni_list_all_node.png)
 
 11.3.Проверка работы HAProxy (балансировка)
 Убедиться, что HAProxy распределяет нагрузку, и что он видит все ноды.
 
 Для начала простая проверка через команду
+
 ![haproxy_test](haproxy_test.png)
 
 
 11.4.Тест на Живучесть (Failover для HAProxy)
+
 На мастере выполним несколько итераций запроса к HAProxy через команду
+
 ![haproxy_send_signal](haproxy_test_send_signal.png)
 
 После чего остановим патрони на одной из реплик и запусти еще раз проверку HAProxy
-![haproxy_send_signal_2_node](haproxy_send_signal_on_2node.png)
+
+![haproxy_send_signal_2_node](haproxy_send_signal_on_2node_test.png)
 
 
 Ошибок нет, HAProxy шлет запросы только на рабочие ноды
