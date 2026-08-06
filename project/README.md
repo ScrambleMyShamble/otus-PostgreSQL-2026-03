@@ -509,37 +509,39 @@ Haproxy настроен.
 11.1. Проверка репликации
 
 На мастере создадим таблицу и запишем данные
+![replica_test_insert](replication_test_insert.png)
 
+Читаем на реплике
 
-Читаем на реплике, дошло
-скрин
+![replica_test_select](replication_test_select.png)
 
 11.2  Отказ мастера (Automatic Failover)
 
 Останавливаем Patroni и Postgres на текущем мастере (192.168.244.131)
+```bash
 sudo systemctl stop patroni
+```
 
 Видим что лидер сменился
-скрин
+![maser_patron_stop](patroni_cluster_1node_stopped.png)
 
 
 Вернем ноду в кластер видим что бывший лидер вернулся и стал репликой, бывшая реплика стала мастером
+![maser_patron_change](patroni_list_all_node.png)
 
 11.3.Проверка работы HAProxy (балансировка)
 Убедиться, что HAProxy распределяет нагрузку, и что он видит все ноды.
 
 Для начала простая проверка через команду
-скрин
+![haproxy_test](haproxy_test.png)
 
 
 11.4.Тест на Живучесть (Failover для HAProxy)
 На мастере выполним несколько итераций запроса к HAProxy через команду
-скрин
+![haproxy_send_signal](haproxy_test_send_signal.png)
 
-После чего остановим патрони на одной из реплик и запусти еще раз првоерку HAProxy
-скрин
+После чего остановим патрони на одной из реплик и запусти еще раз проверку HAProxy
+![haproxy_send_signal_2_node](haproxy_send_signal_on_2node.png)
 
-и запусти еще раз првоерку HAProxy
-скрин
 
 Ошибок нет, HAProxy шлет запросы только на рабочие ноды
