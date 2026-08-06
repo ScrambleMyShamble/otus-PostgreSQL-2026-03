@@ -455,13 +455,13 @@ sudo apt update && sudo apt install -y haproxy keepalived psmisc
 ```bash
 touch /etc/haproxy/haproxy.cfg
 ```
-встевить скрин кода конфига
+![hprxy_cnfg](haproxy_config.png)
 
 ```bash
-Создаем конфиг файл для keepalive, на каждой ноде свои настройки. Отличия между узлами — только state и priority
+Создаем сервис файл для keepalive, на каждой ноде свои настройки. Отличия между узлами — только state и priority
 ```
-скрин
 
+![hprxy_service](haproxy_service.png)
 
 Разрешить bind на не-локальный VIP + запуск (на всех 3 узлах)
 ```bash
@@ -474,12 +474,13 @@ sudo systemctl enable --now haproxy keepalived
 ```
 
 И рестартем
+
 ```bash
 sudo systemctl restart haproxy keepalived
 ```
 
 Поверяем
-скрин
+![keep_alivd_start](keepalived_start.png)
 
 
 Зайдем по адресу http://192.168.244.140:7000/ и проверим статистику + что все работает
