@@ -442,6 +442,10 @@ pg-replica1, исправляем и перезапускаем.
 
 ![ptrn_node3_ok](patroni_cluster_3node.png)
 
+Удобное отображение через docker контейнер ivory
+
+![ivory](ivory.png)
+
 Кластер patroni установлен, все 3 ноды видны и работают.
 
 
