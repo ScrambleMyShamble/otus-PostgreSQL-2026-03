@@ -446,3 +446,57 @@ pg-replica1, исправляем и перезапускаем.
 
 
 ## 10. Установка haproxy.
+Устанавливаем все необходимые пакеты
+```bash
+sudo apt update && sudo apt install -y haproxy keepalived psmisc
+```
+
+Создаем конфиг, одинаковый на всех 3 узлах
+```bash
+touch /etc/haproxy/haproxy.cfg
+```
+встевить скрин кода конфига
+
+```bash
+Создаем конфиг файл для keepalive, на каждой ноде свои настройки. Отличия между узлами — только state и priority
+```
+скрин
+
+
+Разрешить bind на не-локальный VIP + запуск (на всех 3 узлах)
+```bash
+echo 'net.ipv4.ip_nonlocal_bind = 1' | sudo tee /etc/sysctl.d/99-haproxy.conf
+```
+
+Пробуем запустить
+```bash
+sudo systemctl enable --now haproxy keepalived
+```
+
+И рестартем
+```bash
+sudo systemctl restart haproxy keepalived
+```
+
+Поверяем
+скрин
+
+
+Зайдем по адресу http://192.168.244.140:7000/ и проверим статистику + что все работает
+Скрин
+
+Но видим что мастер up, а вот реплики down
+
+Чтобы HAProxy мог успешно проверять состояние реплик, нужно добавить разрешающую строку в файл pg_hba.conf
+Добавляем и проверяем еще раз
+скрин с йп
+
+Нет, все равно реплики down, капаем дальше.
+Заменим в конфиге haproxy в блоке listen postgres_primary, строку httpchk GET /primary на option tcp-check
+ПРоверяем
+скрин
+работает
+Что сделали: option tcp-check проверяет только открытый порт (5432), а httpchk проверял HTTP-ответ от Patroni (порт 8008).
+Как только вы переключили проверку на TCP, HAProxy просто убедился, что порт базы открыт, и сразу поднял реплики в UP.
+
+Haproxy настроен
