@@ -27,3 +27,4 @@
 * [HW-12 Виды и устройство репликации в PostgreSQL](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-12)
 * [HW-13 Секционирование](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-13)
 * [HW-14 Триггеры](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/HW-14)
+* [HW-14 Триггеры](https://github.com/ScrambleMyShamble/otus-PostgreSQL-2026-03/tree/main/project)
