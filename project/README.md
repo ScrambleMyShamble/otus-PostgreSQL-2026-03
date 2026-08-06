@@ -484,13 +484,15 @@ sudo systemctl restart haproxy keepalived
 
 
 Зайдем по адресу http://192.168.244.140:7000/ и проверим статистику + что все работает
-Скрин
+
+![hprxy_replica_down](haproxy_gui_replicadown.png)
 
 Но видим что мастер up, а вот реплики down
 
 Чтобы HAProxy мог успешно проверять состояние реплик, нужно добавить разрешающую строку в файл pg_hba.conf
 Добавляем и проверяем еще раз
-скрин с йп
+
+
 
 Нет, все равно реплики down, капаем дальше.
 Заменим в конфиге haproxy в блоке listen postgres_primary, строку httpchk GET /primary на option tcp-check
