@@ -445,7 +445,7 @@ pg-replica1, исправляем и перезапускаем.
 Кластер patroni установлен, все 3 ноды видны и работают.
 
 
-## 10. Установка haproxy.
+## 10. Установка и настройка haproxy/keepalived.
 Устанавливаем все необходимые пакеты
 ```bash
 sudo apt update && sudo apt install -y haproxy keepalived psmisc
@@ -502,4 +502,6 @@ sudo systemctl restart haproxy keepalived
 Что сделали: option tcp-check проверяет только открытый порт (5432), а httpchk проверял HTTP-ответ от Patroni (порт 8008).
 Как только вы переключили проверку на TCP, HAProxy просто убедился, что порт базы открыт, и сразу поднял реплики в UP.
 
-Haproxy настроен
+Haproxy настроен.
+
+
